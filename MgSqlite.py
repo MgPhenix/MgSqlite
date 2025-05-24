@@ -119,14 +119,3 @@ class Database:
 
 
 
-
-
-
-
-
-os.remove("test1.db")
-data = Database("test1")
-data.createTable("table1",("id",int,True,True),("name",str,False,False),("age",int,False,False))
-#data.simpleExecute("INSERT INTO table1 VALUES(1,'Timéo',11)")
-data.addValToTable("table1",(1,"Timeo",11),())
-print(data.selectFromTable("table1",["id,name,age"],("id",1)))
