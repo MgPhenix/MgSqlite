@@ -33,8 +33,9 @@ class SQL_Execution:
 
 
 
-class Database:
-    def __init__(self, name : str):                        
+class Database(SQL_Execution):
+    def __init__(self, name : str):
+super().__init__()                        
         self.databaseName = str(name)+".db"                               
         try:
             conn = sqlite3.connect(self.databaseName)
