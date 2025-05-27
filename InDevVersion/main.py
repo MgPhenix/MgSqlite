@@ -1,4 +1,4 @@
-from MgSqlite.MgSqlite import *
+from MgSqlite import *
 
 
 
