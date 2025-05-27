@@ -113,8 +113,6 @@ class Database:
                     columnsText +=","
             columnsText+") "
         
-        print(values)
-        print("INSERT INTO "+nameTable + columnsText+" VALUES("+questionMark+")",values)
         self.simpleExecute("INSERT INTO "+nameTable + columnsText+" VALUES("+questionMark+")",values)
 
 
