@@ -3,19 +3,19 @@ from sql_interraction import SQL_Execution
 
 
 class Table(SQL_Execution):
-    def __init__(self, database : object, name : str, *args : tuple) -> None:
+    def __init__(self,database : object, name : str, *args : tuple) -> None:
         super().__init__()
         self.name = name
         self.database = database
         self.database.tableList.append(self)
-        self.value = self.createColumns(args)
-        self.simpleExecute(self.database,"CREATE TABLE " + self.name + " ("+self.value+")")
+        self.__value = self.__createColumns(args)
+        self.simpleExecute(self.database,"CREATE TABLE " + self.name + " ("+self.__value+")")
 
-    def createColumns(self, args : tuple) -> str:               #Take a list of tuples as a parameter and return a string that contains the command to create all the columns in the table
+    def __createColumns(self, args : tuple) -> str:               #Take a list of tuples as a parameter and return a string that contains the command to create all the columns in the table
         value = ""
         for arg in range(len(args)):
             value += args[arg][0] + " "
-            value += self.checkType(args[arg][1]) + " "
+            value += self.__checkType(args[arg][1]) + " "
             if args[arg][2]:
                 value += "PRIMARY KEY "
             if args[arg][3]:
@@ -24,7 +24,7 @@ class Table(SQL_Execution):
                 value += ","
         return value
 
-    def checkType(self, var : type) -> str:                  #Check all the type possible and convert python type to sqlite3 type
+    def __checkType(self, var : type) -> str:                  #Check all the type possible and convert python type to sqlite3 type
         if var == int:
             res = "INTEGER"
         elif var == str:
@@ -83,4 +83,21 @@ class Table(SQL_Execution):
 
         self.simpleExecute(self.database,"INSERT INTO "+self.name + columnsText+" VALUES("+questionMark+")",values)
 
+    def updateValue(self,columnEqualityList : list, *args : tuple) -> None:
+        columnText = ""
+        value = []
+        condition = ""
+        for column in range(len(columnEqualityList)):
+            columnText += columnEqualityList[column][0] + "=?"
+            value.append(columnEqualityList[column][1])
+            if len(columnEqualityList) >1 and column != len(columnEqualityList)-1:
+                columnText+=","
+
+        for arg in range(len(args)):                                         
+            condition+=args[arg][0] + "=?"
+            value.append(args[arg][1])
+            if len(args)>1 and arg != len(args)-1:                           
+                condition+=" AND "
+
+        self.simpleExecute(self.database,"UPDATE "+self.name+" SET "+columnText+" WHERE "+condition,value)
 

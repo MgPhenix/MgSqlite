@@ -13,7 +13,9 @@ class SQL_Execution:
             print("Error : can't connect to the database")
 
         cur = conn.cursor()
-        try:                                                                        
+        try:
+            if database.printSQL:
+                print(command,list)                                                                        
             res = cur.execute(command,list)                                                             # I doesn't like this line because it just repeat the same line 2 time, but it's necessary because when you don't do a SELECT for getting a result you don't have a list to put as parameter      edit : Nevermind i found how to fix that
         except:
             print("Error : can't execute command")
@@ -24,9 +26,11 @@ class SQL_Execution:
         if len(res)>=1:
             return res[0]
 
-    def tryConnect(self,databaseName) -> None:
+    def _tryConnect(self,databaseName : str) -> None:
         try:
             conn = sqlite3.connect(databaseName)
             conn.close()
         except:
             print("Error : Incorrect Name")
+
+    
