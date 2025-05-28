@@ -5,9 +5,16 @@ class Database(SQL_Execution):
     def __init__(self, name : str = "default") -> None:
         super().__init__()                        
         self.databaseName = str(name)+".db"
-        self.tableList = []                               
-        self.tryConnect(self.databaseName)
+        self.tableList = []
+        self.printSQL = False                               
+        self._tryConnect(self.databaseName)
         
+    def turnOffPrintSQL(self) -> None:
+        self.printSQL = False
+
+    def turnOnPrintSQL(self) -> None:
+        self.printSQL = True
+
     def deleteAllTable(self) -> None:
         try:
             for table in self.tableList:
