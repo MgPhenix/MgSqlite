@@ -27,18 +27,21 @@
 ## Installation
 
 Make sure you have Python 3.x installed. Both SQLite and Tkinter are part of the standard Python distribution. To install MgSqlite, clone the repository:
-
+```
 ```bash
-git clone https://github.com/yourusername/MgSqlite.git
+git clone https://github.com/MgPhenix/MgSqlite.git
 cd MgSqlite
+```
+
 Then include the module in your Python project:
 
-python
+```python
 from MgSqlite import Database, SQL_Execution, Table
+```
 Usage
 Here’s a simple example to get you started. This example shows how to create a database, define a table, insert data, and query records:
 
-python
+```python
 from MgSqlite.database import Database
 from MgSqlite.table import Table
 
@@ -64,106 +67,109 @@ users_table.addValue(values=(None, "Alice", 30))  # 'None' for auto-incremented 
 # Query records from the table where age equals 30
 result = users_table.selectValues(["id", "name", "age"], ("age", 30))
 print(result)
+```
 In this example, the module creates a SQLite file (my_database.db), sets up a table named users, and demonstrates how to add and fetch records without writing any SQL manually.
 
-API Reference
-Database Module
-Located in database.py
+## API Reference
+### Database Module:
+Located in ```database.py```
 
 The Database class is responsible for managing your SQLite database file. It provides the following features:
 
-Initialization: Creates (or connects to) a database file with a .db extension and tests connectivity.
+- **Initialization:** Creates (or connects to) a database file with a .db extension and tests connectivity.
 
-Print Control: Use turnOnPrintSQL() and turnOffPrintSQL() to enable or disable the printing of SQL commands for debugging purposes.
+- **Print Control:** Use ```turnOnPrintSQL()``` and ```turnOffPrintSQL()``` to enable or disable the printing of SQL commands for debugging purposes.
 
-Deletion Methods:
+- **Deletion Methods**:
 
-deleteAllTable(): Deletes all tables that have been created in the current database.
+  - ```deleteAllTable()```: Deletes all tables that have been created in the current database.
 
-deleteDatabase(): Removes the entire database file from your system.
+  - ```deleteDatabase()```: Removes the entire database file from your system.
 
-SQL_Execution Module
-Located in sql_interraction.py
+### SQL_Execution Module
+Located in ```sql_interraction.py```
 
 The SQL_Execution class provides core functionalities to execute SQL commands:
 
-simpleExecute(database, command, list=[]): Executes an SQL command on the provided database object. This method:
+- ```simpleExecute(database, command, list=[])```: Executes an SQL command on the provided database object. This method:
 
-Connects to the SQLite database using the database name.
+  - Connects to the SQLite database using the database name.
 
-Prints the SQL command and parameters if printSQL is enabled.
+  - Prints the SQL command and parameters if printSQL is enabled.
 
-Executes the command, fetches results (if applicable), commits the transaction, and closes the connection.
+  - Executes the command, fetches results (if applicable), commits the transaction, and closes the connection.
 
-Returns the fetched results if the command yields any, otherwise returns None.
+  - Returns the fetched results if the command yields any, otherwise returns None.
 
-_tryConnect(databaseName): A helper method that attempts to establish a connection to the specified database. If the connection fails, it prints an error message.
+- ```_tryConnect(databaseName)```: A helper method that attempts to establish a connection to the specified database. If the connection fails, it prints an error message.
 
-Table Module
-Located in table.py
+### Table Module
+Located in ```table.py```
 
-The Table class encapsulates functionalities to manage a table within the database:
+The ```Table``` class encapsulates functionalities to manage a table within the database:
 
-Initialization: When you create a table, you pass parameters (via keyword arguments) including:
+- **Initialization:** When you create a table, you pass parameters (via keyword arguments) including:
 
-name: The name of the table.
+  - ```name```: The name of the table.
 
-database: A Database object where the table belongs.
+  - ```database```: A Database object where the table belongs.
 
-value: A list of tuples defining the columns. Each tuple should be in the form (column_name, type, is_primary_key, autoincrement).
+  - ```value```: A list of tuples defining the columns. Each tuple should be in the form ```(column_name, type, is_primary_key, autoincrement)```.
 
-The table is then created by dynamically constructing and executing a CREATE TABLE SQL command.
+  The table is then created by dynamically constructing and executing a ```CREATE TABLE``` SQL command.
 
-Column Handling: Uses private methods:
+- **Column Handling:** Uses private methods:
 
-__createColumns(args): Constructs a string representing the SQL column definitions.
+  - ```__createColumns(args)```: Constructs a string representing the SQL column definitions.
 
-__checkType(var): Converts Python data types (int, str, or float) into their corresponding SQLite types (INTEGER, TEXT, or REAL).
+  - ```__checkType(var)```: Converts Python data types (```int```, ```str```, or ```float```) into their corresponding SQLite types (```INTEGER```, ```TEXT```, or ```REAL```).
 
-Table Operations:
+- **Table Operations:**
 
-addValue(values, columns=[]): Inserts a new record into the table.
+  - ```addValue(values, columns=[])```: Inserts a new record into the table.
 
-updateValue(columnEqualityList, *args): Updates specific rows with new values based on provided conditions.
+  - ```updateValue(columnEqualityList, *args)```: Updates specific rows with new values based on provided conditions.
 
-selectValues(columnsList, *args): Retrieves specific columns from table records that match the given conditions (using AND logic).
+  - ```selectValues(columnsList, *args)```: Retrieves specific columns from table records that match the given conditions (using ```AND``` logic).
 
-_selectValuesOR(columnsList, args): (Temporary function) Retrieves data with conditions joined using OR instead of AND.
+  - ```_selectValuesOR(columnsList, args)```: (Temporary function) Retrieves data with conditions joined using ```OR``` instead of ```AND```.
 
-selectAll(): Retrieves all records from the table.
+  - ```selectAll()```: Retrieves all records from the table.
 
-deleteTable(): Drops the table if it exists.
+  - ```deleteTable()```: Drops the table if it exists.
 
-GUI Integration: The show() method calls an external Tkinter-based TableViewer (defined in gui.py) that displays the table’s contents in a graphical window.
+  - **GUI Integration:** The ```show()``` method calls an external Tkinter-based TableViewer (defined in ```gui.py```) that displays the table’s contents in a graphical window.
 
-GUI Integration
-Although the actual GUI code is maintained in gui.py, you can easily display your table data by calling the show() method on a Table object:
+## GUI Integration
+Although the actual GUI code is maintained in gui.py, you can easily display your table data by calling the ```show()``` method on a Table object:
 
-python
+```python
 # Launch a Tkinter window to view the "users" table data
 users_table.show()
+```
 This feature leverages Tkinter to provide a simple, visual representation of your data.
 
-Contributing
+## Contributing
 Contributions are welcome! If you have suggestions for improvements or wish to add new features, please follow these steps:
 
 Fork the repository.
 
 Create a new branch:
 
-bash
-git checkout -b feature/YourFeatureName
+bash```
+git checkout -b feature/MgSqlite```
 Commit your changes with a descriptive message:
 
-bash
-git commit -m "Add description of the new feature"
+bash```
+git commit -m "Add description of the new feature"```
+
 Push to your branch:
 
-bash
-git push origin feature/YourFeatureName
+bash```
+git push origin feature/MgSqlite```
 Open a Pull Request with a clear explanation of your changes.
 
-License
+## License
 This project is licensed under the MIT License.
 
 
