@@ -1,4 +1,3 @@
-markdown
 # MgSqlite
 
 **MgSqlite** is a Python module that simplifies the creation and interaction with SQLite databases without the need to write raw SQL commands. Instead, you use built-in functions to create, update, and query your database. It’s particularly well-suited for integration with Tkinter-based GUI applications.
