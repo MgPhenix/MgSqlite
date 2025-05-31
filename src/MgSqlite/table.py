@@ -10,7 +10,7 @@ class Table(SQL_Execution):
         self.database.tableList.append(self)
         self.columns = [i[0] for i in kwargs["value"]]
         self.__value = self.__createColumns(kwargs["value"])
-        self.simpleExecute(self.database,"CREATE TABLE " + self.name + " ("+self.__value+")")
+        self.simpleExecute(self.database,"CREATE TABLE IF NOT EXISTS " + self.name + " ("+self.__value+")")
 
     def __createColumns(self, args : tuple) -> str:               #Take a list of tuples as a parameter and return a string that contains the command to create all the columns in the table
         value = ""
@@ -99,7 +99,7 @@ class Table(SQL_Execution):
             columnsText+") "
         
 
-        self.simpleExecute(self.database,"INSERT INTO "+self.name + columnsText+" VALUES("+questionMark+")",values)
+        self.simpleExecute(self.database,"REPLACE INTO "+self.name + columnsText+" VALUES("+questionMark+")",values)    #Compare to INSERT INGORE Or INSERT … ON DUPLICATE KEY UPDATE
 
     def updateValue(self,columnEqualityList : list, *args : tuple) -> None:
         columnText = ""
