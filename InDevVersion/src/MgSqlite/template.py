@@ -1,4 +1,4 @@
-from .sql_interraction import *
+from .sql_interraction import SQL_Execution
 
 
 
