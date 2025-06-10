@@ -37,20 +37,23 @@ class TableViewer(Tk):
         
 
     def __loadData(self, keyword=""):
-        if keyword:
-            value = []
-            for column in self.table.columns:
-                value.append((column,keyword))
-            rows = self.table._selectValuesOR(self.table.columns,value)
-        else:
-            rows = self.table.selectAll()
-        print(rows)
-        for row in self.tree.get_children():
-            self.tree.delete(row)
-        
-        for row in rows:
-            self.tree.insert("","end", values=row)
-
+        try:
+            if keyword:
+                value = []
+                for column in self.table.columns:
+                    value.append((column,keyword,False))
+                rows = self.table.selectValues(self.table.columns,value)
+                #rows = self.table._selectValuesOR(self.table.columns,value)
+            else:
+                rows = self.table.selectAll()
+            for row in self.tree.get_children():
+                self.tree.delete(row)
+            
+            for row in rows:
+                self.tree.insert("","end", values=row)
+        except:
+            print("invalid research")
+            
     def __searchVal(self):
         keyword = self.entry.get()
         self.__loadData(keyword)

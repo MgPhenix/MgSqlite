@@ -45,6 +45,8 @@ class Table(SQL_Execution):
         Take the list of column and the number you want of tuple who contains : ("name Of The Column", value you want to check if is equal : can be int or float or string or anything else)
 
         """
+        if type(args[0]) == list:
+            args = args[0]
         columnsText = ""
         value = ""
         value2 = []
@@ -57,28 +59,31 @@ class Table(SQL_Execution):
         for arg in range(len(args)):                                         #Create the string who contain the variable to check 
             value+=args[arg][0] + "=?"
             if len(args)>1 and arg != len(args)-1:                           #Check if is needed to put an "AND" when you have multiple variable to check
-                value+=" AND "
+                if args[arg][2]:                           
+                    value+=" AND "
+                else:
+                    value+=" OR "
             value2.append(args[arg][1])
 
         return self.simpleExecute(self.database,"SELECT "+columnsText+" FROM "+self.name+" WHERE "+value,value2)
 
-    def _selectValuesOR(self, columnsList : list, args : list)-> tuple:    #the function is temporary
-        columnsText = ""
-        value = ""
-        value2 = []
+    # def _selectValuesOR(self, columnsList : list, args : list)-> tuple:    #the function is temporary
+    #     columnsText = ""
+    #     value = ""
+    #     value2 = []
 
-        for column in range(len(columnsList)):                                
-            columnsText+= columnsList[column]
-            if len(columnsList)>1 and column != len(columnsList)-1:
-                columnsText+=","
+    #     for column in range(len(columnsList)):                                
+    #         columnsText+= columnsList[column]
+    #         if len(columnsList)>1 and column != len(columnsList)-1:
+    #             columnsText+=","
         
-        for arg in range(len(args)):                                         
-            value+=args[arg][0] + "=?"
-            if len(args)>1 and arg != len(args)-1:                           
-                value+=" OR "
-            value2.append(args[arg][1])
+    #     for arg in range(len(args)):                                         
+    #         value+=args[arg][0] + "=?"
+    #         if len(args)>1 and arg != len(args)-1:                           
+    #             value+=" OR "
+    #         value2.append(args[arg][1])
 
-        return self.simpleExecute(self.database,"SELECT "+columnsText+" FROM "+self.name+" WHERE "+value,value2)
+    #     return self.simpleExecute(self.database,"SELECT "+columnsText+" FROM "+self.name+" WHERE "+value,value2)
 
     def addValue(self, values : tuple, columns : list = []) -> None:
         questionMark = ""
@@ -114,13 +119,33 @@ class Table(SQL_Execution):
         for arg in range(len(args)):                                         
             condition+=args[arg][0] + "=?"
             value.append(args[arg][1])
-            if len(args)>1 and arg != len(args)-1:                           
-                condition+=" AND "
+            if len(args)>1 and arg != len(args)-1:
+                if args[arg][2]:                           
+                    condition+=" AND "
+                else:
+                    condition+=" OR "
 
         self.simpleExecute(self.database,"UPDATE "+self.name+" SET "+columnText+" WHERE "+condition,value)
 
     def selectAll(self) -> None:
         return self.simpleExecute(self.database,"SELECT * FROM "+self.name)
+
+
+    def deleteValue(self, *args) -> None:
+        condition =""
+        value = []
+
+        for arg in range(len(args)):
+            condition+=args[arg][0] + "=?"
+            value.append(args[arg][1])
+            if len(args)>1 and arg != len(args)-1:                           
+                if args[arg][2]:                           
+                    condition+=" AND "
+                else:
+                    condition+=" OR "
+
+        self.simpleExecute(self.database,"DELETE FROM "+self.name+" WHERE "+condition,value)
+
 
     def show(self):
         viewer = TableViewer(self)

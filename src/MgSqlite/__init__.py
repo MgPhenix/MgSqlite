@@ -1,9 +1,9 @@
 
 """
-MgSqlite is module for create and interract with database without using sql, the module use sqlite3 but for create and interract with database you don't need to code in sql just use all the functions
+MgSqlite is a Python module designed to create and interact with SQLite databases without writing raw SQL. It leverages sqlite3 under the hood, allowing you to manage your database effortlessly using simple function calls.
 """
 
-__version__ = "0.5"
+__version__ = "0.6"
 
 from .database import Database
 from .sql_interraction import SQL_Execution
