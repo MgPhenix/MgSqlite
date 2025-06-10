@@ -128,11 +128,9 @@ The ```Table``` class encapsulates functionalities to manage a table within the 
 
   - ```addValue(values, columns=[])```: Inserts a new record into the table.
 
-  - ```updateValue(columnEqualityList, *args)```: Updates specific rows with new values based on provided conditions.
+  - ```updateValue(columnEqualityList, *args)```: Updates specific rows with new values based on provided conditions, ```args``` should be in form ```(Column, Value,"OR"/"AND")```.
 
-  - ```selectValues(columnsList, *args)```: Retrieves specific columns from table records that match the given conditions (using ```AND``` logic).
-
-  - ```_selectValuesOR(columnsList, args)```: (Temporary function) Retrieves data with conditions joined using ```OR``` instead of ```AND```.
+  - ```selectValues(columnsList, *args)```: Retrieves specific columns from table records that match the given conditions, ```args``` should be in form ```(Column, Value,"OR"/"AND")```.
 
   - ```selectAll()```: Retrieves all records from the table.
 
