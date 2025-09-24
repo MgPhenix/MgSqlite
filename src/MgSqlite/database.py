@@ -5,35 +5,35 @@ from .table import Table
 
 class Database(SQL_Execution):
     """
-        Initialize a new Database object and connect to a SQLite database file.
+    Initialize a new Database object and connect to a SQLite database file.
 
-        Parameters
-        ----------
-        name : str, optional
-            The name of the database (without extension). Default is "default".
-            The actual file used will be `name + ".db"`.
+    Parameters
+    ----------
+    name : str, optional
+        The name of the database (without extension). Default is "default".
+        The actual file used will be `name + ".db"`.
 
-        Attributes
-        ----------
-        databaseName : str
-            The full filename of the SQLite database.
-        tableList : list
-            List of Table instances created in this database.
-        printSQL : bool
-            If True, executed SQL statements will be printed for debugging.
-        _tryConnect : method
-            Internal method used to attempt connection to the SQLite database.
+    Attributes
+    ----------
+    databaseName : str
+        The full filename of the SQLite database.
+    tableList : list
+        List of Table instances created in this database.
+    printSQL : bool
+        If True, executed SQL statements will be printed for debugging.
+    _tryConnect : method
+        Internal method used to attempt connection to the SQLite database.
 
-        Notes
-        -----
-        - If the database file does not exist, it will be created automatically.
-        - Tables created in this database should be registered in `tableList`.
+    Notes
+    -----
+    - If the database file does not exist, it will be created automatically.
+    - Tables created in this database should be registered in `tableList`.
 
-        Example
-        -------
-        >>> db = Database("mydb")
-        >>> print(db.databaseName)
-        "mydb.db"
+    Example
+    -------
+    >>> db = Database("mydb")
+    >>> print(db.databaseName)
+    "mydb.db"
     """
     def __init__(self,name : str = "default") -> None:
         super().__init__()                        

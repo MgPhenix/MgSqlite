@@ -353,7 +353,7 @@ class Table(SQL_Execution):
         self.simpleExecute(self.database,"DELETE FROM "+self.name+" WHERE "+condition,value)
 
     def save(self,name : str):
-        result = f"CREATE TABLE IF NOT EXISTS {name}("
+        result = f"CREATE TABLE IF NOT EXISTS {name}("                                    #What the fucking fuck this function do ? I don't even know where it used of even if it used somewhere, so i let it here bruh
         dict = self.__dict__
         for key, value in dict.items():
             result += str(key) + " " + self.__checkType(value) + ","
