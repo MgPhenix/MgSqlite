@@ -232,10 +232,9 @@ class Table(SQL_Execution):
         for value in values:
             self.addValue(value)
 
-
-    def updateValue(self,columnEqualityList : list, *args : tuple) -> None:
+    def updateValue(self,columnEqualityList : list, where : str = None):
         """
-        Update rows in the table based on specified conditions.
+        Update rows in the table based on a SQL-like WHERE string.
 
         Parameters
         ----------
@@ -243,21 +242,38 @@ class Table(SQL_Execution):
             List of columns to update with their new values.
             Each tuple: (column_name, new_value)
             Example: [("name", "Alice")]
-
-        *args : tuple(s)
-            Conditions for selecting rows to update.
-            Each tuple: (column_name, value, use_and)
-            - `use_and` (bool): True for AND, False for OR when combining multiple conditions.
-            Example: ("id", 1, True)
+        where : str, optional
+            SQL-like condition string to filter rows.
+            Can include multiple conditions combined with AND / OR.
+            Example: "id = 1 AND name = 'Ted' OR status = 'active'"
 
         Notes
         -----
         - Executes an UPDATE query internally.
-        - Multiple columns and conditions are supported.
+        - Multiple columns can be updated at once.
+        - Conditions are safely converted to parameterized SQLite queries.
 
         Example
         -------
-        >>> users.updateValue([("name", "Alice")], ("id", 1, True))
+        >>> users.updateValue([("name", "Alice")], "id = 1 AND name = 'Ted'")
+        """
+        columnText = ""
+        value = []
+        condition = ""
+        for column in range(len(columnEqualityList)):
+            columnText += columnEqualityList[column][0] + "=?"
+            value.append(columnEqualityList[column][1])
+            if len(columnEqualityList) >1 and column != len(columnEqualityList)-1:
+                columnText+=","
+
+        equality, values = self.__build(self.__tokenize(where))
+
+        self.simpleExecute(self.database,"UPDATE "+self.name+" SET "+columnText+" WHERE "+equality,values)
+
+
+    def updateValueOld(self,columnEqualityList : list, *args : tuple) -> None:
+        """
+        /!\ Deprecated
         """
         columnText = ""
         value = []
@@ -295,26 +311,32 @@ class Table(SQL_Execution):
         """
         return self.simpleExecute(self.database,"SELECT * FROM "+self.name)
 
-
-    def deleteValue(self, *args) -> None:
+    def deleteValue(self, where : str = None) -> None:
         """
-        Delete rows from the table based on specified conditions.
+        Delete rows from the table based on a SQL-like WHERE string.
 
         Parameters
         ----------
-        *args : tuple(s)
-            Conditions for selecting rows to delete.
-            Each tuple: (column_name, value, use_and)
-            - `use_and` (bool): True to combine with AND, False to combine with OR.
-            Example: ("id", 1, True)
+        where : str, optional
+            SQL-like condition string to filter rows.
+            Can include multiple conditions combined with AND / OR.
+            Example: "id = 1 OR name = 'Bob'"
 
         Notes
         -----
         - Executes a DELETE query internally.
+        - Conditions are safely converted to parameterized SQLite queries.
 
         Example
         -------
-        >>> users.deleteValue(("id", 1, True))
+        >>> users.deleteValue("id = 1 AND status = 'inactive'")
+        """
+        equality, values = self.__build(self.__tokenize(where))
+        self.simpleExecute(self.database,"DELETE FROM "+self.name+" WHERE "+equality,values)
+
+    def deleteValueOld(self, *args) -> None:
+        """
+        /!\ Deprecated
         """
         condition =""
         value = []
