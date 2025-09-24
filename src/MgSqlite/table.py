@@ -4,6 +4,48 @@ from .gui import TableViewer
 from .json_convert import _createFile
 
 class Table(SQL_Execution):
+    """
+    Initialize a new Table object and create the table in the database if it does not exist.
+
+    Parameters
+    ----------
+    **kwargs : dict
+        Expected keys:
+            - `database` (Database): The database object this table belongs to.
+            - `name` (str): The name of the table.
+            - `value` (list[tuple]): A list of tuples defining the columns.
+                Each tuple must follow the format:
+                    (column_name: str, python_type: type, primary_key: bool, autoincrement: bool)
+
+                - `column_name`: Name of the column.
+                - `python_type`: Python type (`int`, `str`, `float`, etc.), internally mapped to SQL.
+                - `primary_key`: Whether this column is the PRIMARY KEY.
+                - `autoincrement`: Whether this column uses AUTOINCREMENT.
+
+                Example:
+                [
+                    ("id", int, True, True),
+                    ("name", str, False, False)
+                ]
+
+    Notes
+    -----
+    - The SQL column types are automatically inferred from Python types.
+    - The table is created in the database if it does not already exist.
+    - The table instance is automatically registered in `database.tableList`.
+
+    Example
+    -------
+    >>> db = Database("mydb")
+    >>> users = Table(
+    ...     database=db,
+    ...     name="users",
+    ...     value=[
+    ...         ("id", int, True, True),
+    ...         ("name", str, False, False)
+    ...     ]
+    ... )
+    """
     def __init__(self, **kwargs) -> None:   #database : Database, name : str, *args : tuple
         super().__init__()
         self.name = kwargs["name"]
@@ -53,6 +95,26 @@ class Table(SQL_Execution):
         return equality, params
 
     def selectValues(self,columnsList : list, where :  str = None):
+        """
+        Retrieve specific columns from the table, optionally filtered by a WHERE clause.
+
+        Parameters
+        ----------
+        columnsList : list
+            List of column names to retrieve. Example: ["id", "name"]
+        where : str, optional
+            SQL-like condition string. Example: "id = 1 AND name = 'Alice'"
+
+        Returns
+        -------
+        list
+            List of tuples containing the requested column values.
+
+        Example
+        -------
+        >>> users.selectValues(["id", "name"], "id = 1")
+        [(1, "Alice")]
+        """
         columnsText=""
         for column in range(len(columnsList)):                                #Create the string who contain the name of the columns you want to get
             columnsText+= columnsList[column]
@@ -93,9 +155,41 @@ class Table(SQL_Execution):
 
     
     def deleteTable(self) -> None:
+            """
+            Delete the table from the database.
+
+            Notes
+            -----
+            - The table will be removed if it exists.
+            - This action is irreversible.
+
+            Example
+            -------
+            >>> users.deleteTable()
+            """
             self.simpleExecute(self.database,"DROP TABLE IF EXISTS "  + self.name)
 
     def addValue(self, values : tuple, columns : list = []) -> None:
+        """
+        Insert or replace a row in the table.
+
+        Parameters
+        ----------
+        values : tuple
+            Tuple of values to insert into the table. Example: (1, "Alice")
+        columns : list, optional
+            List of column names corresponding to the values. If omitted, all columns are used.
+            Example: ["id", "name"]
+
+        Notes
+        -----
+        - This uses a REPLACE INTO query, which will insert a new row or replace an existing row
+        if a PRIMARY KEY conflict occurs.
+
+        Example
+        -------
+        >>> users.addValue((1, "Alice"), ["id", "name"])
+        """
         questionMark = ""
         columnsText = ""
         
@@ -117,11 +211,54 @@ class Table(SQL_Execution):
         self.simpleExecute(self.database,"REPLACE INTO "+self.name + columnsText+" VALUES("+questionMark+")",values)    #Compare to INSERT INGORE Or INSERT … ON DUPLICATE KEY UPDATE
 
     def addMultipleValues(self,values : list) -> None:
+        """
+        Insert or replace multiple rows in the table.
+
+        Parameters
+        ----------
+        values : list of tuples
+            Each tuple contains values for one row.
+            Example: [(1, "Alice"), (2, "Bob")]
+
+        Notes
+        -----
+        - Internally calls `addValue` for each row.
+        - Uses REPLACE INTO, so existing rows with the same PRIMARY KEY will be replaced.
+
+        Example
+        -------
+        >>> users.addMultipleValues([(1, "Alice"), (2, "Bob")])
+        """
         for value in values:
             self.addValue(value)
 
 
     def updateValue(self,columnEqualityList : list, *args : tuple) -> None:
+        """
+        Update rows in the table based on specified conditions.
+
+        Parameters
+        ----------
+        columnEqualityList : list of tuples
+            List of columns to update with their new values.
+            Each tuple: (column_name, new_value)
+            Example: [("name", "Alice")]
+
+        *args : tuple(s)
+            Conditions for selecting rows to update.
+            Each tuple: (column_name, value, use_and)
+            - `use_and` (bool): True for AND, False for OR when combining multiple conditions.
+            Example: ("id", 1, True)
+
+        Notes
+        -----
+        - Executes an UPDATE query internally.
+        - Multiple columns and conditions are supported.
+
+        Example
+        -------
+        >>> users.updateValue([("name", "Alice")], ("id", 1, True))
+        """
         columnText = ""
         value = []
         condition = ""
@@ -143,10 +280,42 @@ class Table(SQL_Execution):
         self.simpleExecute(self.database,"UPDATE "+self.name+" SET "+columnText+" WHERE "+condition,value)
 
     def selectAll(self) -> None:
+        """
+        Retrieve all rows and columns from the table.
+
+        Returns
+        -------
+        list of tuples
+            All rows in the table.
+
+        Example
+        -------
+        >>> users.selectAll()
+        [(1, "Alice"), (2, "Bob")]
+        """
         return self.simpleExecute(self.database,"SELECT * FROM "+self.name)
 
 
     def deleteValue(self, *args) -> None:
+        """
+        Delete rows from the table based on specified conditions.
+
+        Parameters
+        ----------
+        *args : tuple(s)
+            Conditions for selecting rows to delete.
+            Each tuple: (column_name, value, use_and)
+            - `use_and` (bool): True to combine with AND, False to combine with OR.
+            Example: ("id", 1, True)
+
+        Notes
+        -----
+        - Executes a DELETE query internally.
+
+        Example
+        -------
+        >>> users.deleteValue(("id", 1, True))
+        """
         condition =""
         value = []
 
@@ -170,7 +339,19 @@ class Table(SQL_Execution):
         result += ")"
         self.simpleExecute(self.database,result)
 
-    def show(self):
+    def show(self) -> None:
+        """
+        Display the table in a graphical viewer.
+
+        Notes
+        -----
+        - Opens a GUI window using TableViewer to browse table contents.
+        - No return value.
+
+        Example
+        -------
+        >>> users.show()
+        """
         viewer = TableViewer(self)
         viewer.mainloop()
 
@@ -190,4 +371,22 @@ class Table(SQL_Execution):
         return dico
     
     def convertJson(self,name : str = "default",indentVal : int = 2)->None:
+        """
+        Export the table contents to a JSON file.
+
+        Parameters
+        ----------
+        name : str, optional
+            Name of the output JSON file (without extension). Default is "default".
+        indentVal : int, optional
+            Number of spaces for indentation in the JSON file. Default is 2.
+
+        Notes
+        -----
+        - The JSON file will be saved as `name + ".json"`.
+
+        Example
+        -------
+        >>> users.convertJson("users_data", indentVal=4)
+        """
         _createFile(self._createDict(),name,indentVal)

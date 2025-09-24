@@ -1,10 +1,44 @@
 import sqlite3
 
 class SQL_Execution:
+    """
+    Base class providing methods to execute SQL queries.
+
+    Notes
+    -----
+    - Not meant to be used directly.
+    - Inherited by classes like `Table` and `Database`.
+    - Provides helper methods for executing, fetching, and managing SQL statements.
+    """
 
     def simpleExecute(self,database : object, command : str, list : list = []) -> tuple:                  #Function for execute One command in sqlite3, just to shorten the code
         """
-        Execute sql script, return a value if the command is a selection return None if not
+        Execute a single SQL command on the specified database.
+
+        Parameters
+        ----------
+        database : object
+            Database instance to execute the command on.
+        command : str
+            SQL command to execute.
+        list : list, optional
+            Optional list of parameters for parameterized queries. Default is [].
+
+        Returns
+        -------
+        tuple
+            Fetched results for SELECT queries.
+            Returns None for commands that do not return rows (INSERT, UPDATE, DELETE).
+
+        Notes
+        -----
+        - Prints the command and parameters if `database.printSQL` is True.
+        - Commits changes and closes the connection automatically.
+
+        Example
+        -------
+        >>> db.simpleExecute(db, "SELECT * FROM users WHERE id=?", [1])
+        ((1, "Alice"),)
         """
         try:
             conn = sqlite3.connect(database.databaseName)
@@ -51,12 +85,3 @@ class SQL_Execution:
         else:
             res = "NULL"
         return res
-
-    # def save(self,name : str, database : object):
-    #     result = f"CREATE TABLE IF NOT EXISTS {name}("
-    #     dict = self.__dict__
-    #     for key, value in dict.items():
-    #         result += str(key) + " " + self.checkType(value) + ","
-    #     result = result[:-1]
-    #     result += ")"
-    #     self.simpleExecute(database,result)
