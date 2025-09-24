@@ -26,43 +26,47 @@ class Table(SQL_Execution):
                 value += ","
         return value
 
+    def __tokenize(self,string):
+        string = string.split()
+        i = 0
+        conditions = []
+        while i < len(string):
+            temp=[]
+            temp.append(string[i])
+            temp.append(string[i+1])
+            temp.append(string[i+2])
+            if not i > len(string)-4 and string[i+3].lower() in ("or","and"):
+                temp.append(string[i+3].upper())
+            conditions.append(temp)
+            i+=4
+        return conditions
 
-    def deleteTable(self) -> None:
-        self.simpleExecute(self.database,"DROP TABLE IF EXISTS "  + self.name)
+    def __build(self,conditions):
+        equality = ""
+        params = []
+        for i in conditions:
+            print(i)
+            equality+=f"{i[0]}{i[1]}? "
+            if len(i) > 3:
+                equality+=i[3] + " "
+            params.append(i[2])
+        return equality, params
 
-    # def selectValues(self,sign : str ,columnsList : list, *args) -> tuple:
-    #     """
-    #     Select an list of Column where a variable of this column is equal to a chosen value
-    #     Take the list of column and the number you want of tuple who contains : ("name Of The Column", value you want to check if is equal : can be int or float or string or anything else)
+    def selectValues(self,columnsList : list, where :  str = None):
+        columnsText=""
+        for column in range(len(columnsList)):                                #Create the string who contain the name of the columns you want to get
+            columnsText+= columnsList[column]
+            if len(columnsList)>1 and column != len(columnsList)-1:
+                columnsText+=","
+        equality, values = self.__build(self.__tokenize(where))
 
-    #     """
-
-    #     if type(args[0]) == list:
-    #         args = args[0]
-    #     columnsText = ""
-    #     value = ""
-    #     value2 = []
-
-    #     for column in range(len(columnsList)):                                #Create the string who contain the name of the columns you want to get
-    #         columnsText+= columnsList[column]
-    #         if len(columnsList)>1 and column != len(columnsList)-1:
-    #             columnsText+=","
-        
-    #     for arg in range(len(args)):                                         #Create the string who contain the variable to check 
-    #         print(args[arg])
-    #         value+=args[arg][0] + f"{sign}?"
-    #         if len(args)>1 and arg != len(args)-1:                           #Check if is needed to put an "AND" when you have multiple variable to check
-    #             if args[arg][2]:                           
-    #                 value+=" AND "
-    #             else:
-    #                 value+=" OR "
-    #         value2.append(args[arg][1])
-        
-    #     return self.simpleExecute(self.database,"SELECT "+columnsText+" FROM "+self.name+" WHERE ("+value+")",value2)
+        return self.simpleExecute(self.database,"SELECT "+columnsText+" FROM "+self.name+" WHERE ("+equality+")",values)
 
 
-    def selectValues(self,columnsList : list, *args : dict) -> tuple:
+
+    def selectValuesOld(self,columnsList : list, *args : dict) -> tuple:
         """
+        /!\ Deprecated
         Select an list of Column where a variable of this column is equal to a chosen value
         Take the list of column and the number you want of tuple who contains : ("name Of The Column", value you want to check if is equal : can be int or float or string or anything else)
 
@@ -87,26 +91,9 @@ class Table(SQL_Execution):
         
         return self.simpleExecute(self.database,"SELECT "+columnsText+" FROM "+self.name+" WHERE ("+value+")",value2)
 
-
-
-
-    # def _selectValuesOR(self, columnsList : list, args : list)-> tuple:    #the function is temporary
-    #     columnsText = ""
-    #     value = ""
-    #     value2 = []
-
-    #     for column in range(len(columnsList)):                                
-    #         columnsText+= columnsList[column]
-    #         if len(columnsList)>1 and column != len(columnsList)-1:
-    #             columnsText+=","
-        
-    #     for arg in range(len(args)):                                         
-    #         value+=args[arg][0] + "=?"
-    #         if len(args)>1 and arg != len(args)-1:                           
-    #             value+=" OR "
-    #         value2.append(args[arg][1])
-
-    #     return self.simpleExecute(self.database,"SELECT "+columnsText+" FROM "+self.name+" WHERE "+value,value2)
+    
+    def deleteTable(self) -> None:
+            self.simpleExecute(self.database,"DROP TABLE IF EXISTS "  + self.name)
 
     def addValue(self, values : tuple, columns : list = []) -> None:
         questionMark = ""
