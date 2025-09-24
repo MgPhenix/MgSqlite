@@ -112,6 +112,7 @@ class Database(SQL_Execution):
         dico = {name : []}
         for table in self.tableList:
             dico[name].append(table._createDict())
+        print(self.tableList)
         return dico
 
     def convertJson(self,name : str = "default",indentVal : int = 2):
@@ -175,3 +176,31 @@ class Database(SQL_Execution):
             allValue.append(toAddValueList)
         table.addMultipleValues(allValue)
         return table
+    
+def __convertDictToTuple(liste : list) -> list:
+    list_tuple = []
+    for i in liste:
+        temp = []
+        for key,value in i.items():
+            temp.append(value)
+        list_tuple.append(temp)
+    return list_tuple
+
+def generateDatabase(file : str) -> Database:
+    dict = _loadFile(file)
+    for key in dict.keys():
+        name = key
+    database = Database(name=name)
+    for key,val in dict[name][0].items():
+        table_name = key
+        column = [key_col for key_col,value in val[0].items()]
+        col_type = [type(value_2) for key_col_2,value_2 in val[0].items()]
+        param_list = []
+        for element in range(len(column)):
+            temp = (column[element],col_type[element],False,False)
+            param_list.append(temp)
+        print(val)
+        table = Table(database=database,name=table_name,value=(param_list))
+        table.addMultipleValues(__convertDictToTuple(val))
+        database.tableList.append(table)
+    return database

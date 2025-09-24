@@ -87,7 +87,6 @@ class Table(SQL_Execution):
         equality = ""
         params = []
         for i in conditions:
-            print(i)
             equality+=f"{i[0]}{i[1]}? "
             if len(i) > 3:
                 equality+=i[3] + " "
