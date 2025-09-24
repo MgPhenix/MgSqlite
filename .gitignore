@@ -8,3 +8,4 @@ src/ModelTest.py
 src/test_object.py
 src/jsonTest.py
 *.db
+*.json
